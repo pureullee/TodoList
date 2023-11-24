@@ -12,7 +12,7 @@ import com.example.todolist.db.AppDatabase
 import com.example.todolist.db.ToDoDao
 import com.example.todolist.db.ToDoEntity
 
-class MainActivity : AppCompatActivity(), OnItemLongClickListener {
+class MainActivity : AppCompatActivity(), OnItemClickListener{
 
     private lateinit var binding : ActivityMainBinding
 
@@ -60,7 +60,13 @@ class MainActivity : AppCompatActivity(), OnItemLongClickListener {
         getAllTodoList()
     }
 
-    override fun onLongClick(position: Int) {
+
+
+    override fun onEditClick(position: Int) {
+        //구현
+    }
+
+    override fun onDeleteClick(position: Int) {
         val builder : AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setTitle("할 일 삭제")
         builder.setMessage("정말 삭제하시겠습니까?")
@@ -69,10 +75,14 @@ class MainActivity : AppCompatActivity(), OnItemLongClickListener {
             object : DialogInterface.OnClickListener{
                 override fun onClick(p0 : DialogInterface?, p1: Int){
                     deleteTodo(position)
+
                 }
             })
         builder.show()
     }
+
+
+
 
     private fun deleteTodo(position: Int) {
         Thread{

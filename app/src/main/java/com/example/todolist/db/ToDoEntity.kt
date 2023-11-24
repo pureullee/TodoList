@@ -11,5 +11,6 @@ data class ToDoEntity (
     @PrimaryKey(autoGenerate = true) var id : Int? = null,
     @ColumnInfo(name="title") val title : String,
     @ColumnInfo(name="importance") val importance : Int,
-    @ColumnInfo(name="date") val date : Date? = null
+    @ColumnInfo(name="date") val date : Date? = null,
+    @ColumnInfo(name="isVisible") var isVisible : Boolean = false
 )
