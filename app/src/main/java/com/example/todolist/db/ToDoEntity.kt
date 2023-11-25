@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
+import java.io.Serializable
 
 
 @Entity
@@ -13,4 +14,4 @@ data class ToDoEntity (
     @ColumnInfo(name="importance") val importance : Int,
     @ColumnInfo(name="date") val date : Date? = null,
     @ColumnInfo(name="isVisible") var isVisible : Boolean = false
-)
+) : Serializable

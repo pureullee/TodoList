@@ -23,7 +23,6 @@ class AddTodoActivity : AppCompatActivity() {
     lateinit var db : AppDatabase
     lateinit var todoDao : ToDoDao
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,9 +32,11 @@ class AddTodoActivity : AppCompatActivity() {
         db = AppDatabase.getInstance(this)!!
         todoDao = db.getTodoDao()
 
-        binding.btnCompletion.setOnClickListener{
-            insertTodo()
-        }
+        var isEditMode = intent.getBooleanExtra("isEditMode", false)
+
+
+
+
 
         // 현재 날짜 초기화
         binding.date.text = getCurrentDate()
@@ -45,9 +46,72 @@ class AddTodoActivity : AppCompatActivity() {
             showDatePicker()
         }
 
-
+        // 수정 모드
+        if (isEditMode) {
+            initEdit()
+        } else {
+            //완료 버튼
+            binding.btnCompletion.setOnClickListener{
+                insertTodo()
+            }
+        }
 
     }
+    private fun initEdit(){
+        val todoItem = intent.getSerializableExtra("todoItem") as ToDoEntity
+        // 기존 정보 화면에 넣기
+        binding.edtTitle.setText(todoItem.title)
+
+        when (todoItem.importance) {
+            1 -> binding.radioGroup.check(R.id.btn_high)
+            2 -> binding.radioGroup.check(R.id.btn_middle)
+            3 -> binding.radioGroup.check(R.id.btn_low)
+        }
+
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate = format.format(todoItem.date)
+        binding.date.text = formattedDate
+
+        binding.btnCompletion.setOnClickListener{
+            updateTodo(todoItem)
+        }
+    }
+
+    private fun updateTodo(todoItem : ToDoEntity) {
+        val todoTitle = binding.edtTitle.text.toString()
+        var todoImportance = binding.radioGroup.checkedRadioButtonId
+        val todoDateStr = binding.date.text.toString()
+
+        when (todoImportance) {
+            R.id.btn_high -> {
+                todoImportance = 1
+            }
+            R.id.btn_middle -> {
+                todoImportance = 2
+            }
+            R.id.btn_low -> {
+                todoImportance = 3
+            }
+            else -> { todoImportance = -1}
+        }
+
+        if (todoImportance == -1 || todoTitle.isBlank()){
+            Toast.makeText(this,"모든 항목을 채워주세요.",
+                Toast.LENGTH_SHORT).show()
+        } else {
+            val todoDate = convertStringToDate(todoDateStr)
+
+            Thread {
+                todoDao.updateTodo(ToDoEntity(todoItem.id, todoTitle, todoImportance, todoDate))
+                runOnUiThread{
+                    Toast.makeText(this,"수정되었습니다.",
+                        Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }.start()
+        }
+    }
+
     private fun showDatePicker() {
         // 현재 날짜 가져오기
         val calendar = Calendar.getInstance()

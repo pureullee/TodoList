@@ -15,7 +15,6 @@ import com.example.todolist.db.ToDoEntity
 class MainActivity : AppCompatActivity(), OnItemClickListener{
 
     private lateinit var binding : ActivityMainBinding
-
     private lateinit var db : AppDatabase
     private lateinit var todoDao : ToDoDao
     private lateinit var todoList : ArrayList<ToDoEntity>
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener{
         runOnUiThread{
             adapter = TodoRecyclerViewAdapter(todoList, this)
             binding.recyclerView.adapter = adapter
-
             binding.recyclerView.layoutManager = LinearLayoutManager(this)
 
         }
@@ -63,7 +61,10 @@ class MainActivity : AppCompatActivity(), OnItemClickListener{
 
 
     override fun onEditClick(position: Int) {
-        //구현
+        val intent = Intent(this, AddTodoActivity::class.java)
+        intent.putExtra("isEditMode", true)
+        intent.putExtra("todoItem", todoList[position])
+        startActivity(intent)
     }
 
     override fun onDeleteClick(position: Int) {
@@ -80,8 +81,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener{
             })
         builder.show()
     }
-
-
 
 
     private fun deleteTodo(position: Int) {
