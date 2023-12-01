@@ -6,25 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="parent">
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_add"/>
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/add_todo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="30dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"/>
 
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.databinding.ItemTodoBinding
 import com.example.todolist.db.ToDoEntity
-import java.util.Calendar
+import android.icu.util.Calendar
 import java.util.Locale
 
 class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, private val listener: OnItemClickListener) : RecyclerView.Adapter<TodoRecyclerViewAdapter.MyViewHolder>(){
@@ -21,6 +21,8 @@ class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, priv
         val root = binding.root
         val btn_edit = binding.btnEdit
         val btn_delete = binding.btnDelete
+        val tv_bar = binding.tvBar
+        val tv_check = binding.tvCheck
         }
 
     override fun onCreateViewHolder(
@@ -34,37 +36,49 @@ class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, priv
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val todoData = todoList[position]
-        val currentDate = Calendar.getInstance().time
-
+        val today = Calendar.getInstance()
+        today.set(Calendar.HOUR_OF_DAY,0)
+        today.set(Calendar.MINUTE,0)
+        today.set(Calendar.SECOND,0)
+        today.set(Calendar.MILLISECOND,0)
         holder.tv_tab.visibility = if (todoData.isVisible) View.VISIBLE else View.INVISIBLE
-        //time out 관련
-        if (todoData.date!!.before(currentDate)) {
-            holder.tv_importance.setBackgroundResource(R.color.gray)
+
+        //check 여부 확인
+        if (todoData.isCheck) {
+            holder.tv_importance.visibility = View.INVISIBLE
+            holder.tv_check.visibility = View.VISIBLE
         } else {
-            when (todoData.importance) {
-                1 -> {
-                    holder.tv_importance.setBackgroundResource(R.color.red)
-                }
+            holder.tv_importance.visibility = View.VISIBLE
+            holder.tv_check.visibility = View.GONE
+        }
+        //time out 관련
+        if (todoData.date!!.before(today.time)) {
+            holder.tv_importance.setBackgroundResource(R.color.gray)
+            holder.tv_importance.isEnabled = false
+            holder.tv_check.isEnabled = false
+        } else {
+                when (todoData.importance) {
+                    1 -> {
+                        holder.tv_importance.setBackgroundResource(R.color.red)
+                    }
 
-                2 -> {
-                    holder.tv_importance.setBackgroundResource(R.color.yellow)
-                }
+                    2 -> {
+                        holder.tv_importance.setBackgroundResource(R.color.yellow)
+                    }
 
-                3 -> {
-                    holder.tv_importance.setBackgroundResource(R.color.green)
+                    3 -> {
+                        holder.tv_importance.setBackgroundResource(R.color.green)
+                    }
                 }
             }
-        }
         holder.tv_importance.text = todoData.importance.toString()
         holder.tv_title.text = todoData.title
         holder.tv_date.text = String.format(Locale.getDefault(),"%tF", todoData.date)
 
-        holder.root.setOnClickListener{
+        holder.tv_bar.setOnClickListener{
             //토글
             todoData.isVisible = !todoData.isVisible
-
             holder.tv_tab.visibility = if (todoData.isVisible) View.VISIBLE else View.INVISIBLE
-
         }
 
         holder.btn_edit.setOnClickListener{
@@ -74,8 +88,16 @@ class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, priv
             listener.onDeleteClick(position)
         }
 
-    }
+        holder.tv_importance.setOnClickListener{
+            todoData.isCheck = true
+            listener.onCheckClick(position)
 
+        }
+        holder.tv_check.setOnClickListener{
+            todoData.isCheck = false
+            listener.onCheckClick(position)
+        }
+    }
 
 
     override fun getItemCount(): Int {

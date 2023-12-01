@@ -13,5 +13,6 @@ data class ToDoEntity (
     @ColumnInfo(name="title") val title : String,
     @ColumnInfo(name="importance") val importance : Int,
     @ColumnInfo(name="date") val date : Date? = null,
-    @ColumnInfo(name="isVisible") var isVisible : Boolean = false
+    @ColumnInfo(name="isVisible") var isVisible : Boolean = false,
+    @ColumnInfo(name="isCheck") var isCheck : Boolean = false
 ) : Serializable

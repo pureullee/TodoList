@@ -1,98 +1,52 @@
 package com.example.todolist
 
-import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.content.Intent
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.todolist.databinding.ActivityMainBinding
-import com.example.todolist.db.AppDatabase
-import com.example.todolist.db.ToDoDao
-import com.example.todolist.db.ToDoEntity
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : AppCompatActivity(), OnItemClickListener{
+class MainActivity : AppCompatActivity(){
 
     private lateinit var binding : ActivityMainBinding
-    private lateinit var db : AppDatabase
-    private lateinit var todoDao : ToDoDao
-    private lateinit var todoList : ArrayList<ToDoEntity>
-    private lateinit var adapter: TodoRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnAdd.setOnClickListener{
-            val intent = Intent(this, AddTodoActivity::class.java)
-            startActivity(intent)
-        }
+        val fragmentList = listOf(MainFragment(), CheckFragment())
+        val adapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
 
-        db = AppDatabase.getInstance(this)!!
-        todoDao = db.getTodoDao()
+        binding.viewPager.adapter = adapter
 
-        getAllTodoList()
-    }
-
-    private fun getAllTodoList(){
-        Thread{
-            todoList = ArrayList(todoDao.getAll())
-            setRecyclerView()
-        }.start()
-    }
-
-    private fun setRecyclerView() {
-
-        runOnUiThread{
-            adapter = TodoRecyclerViewAdapter(todoList, this)
-            binding.recyclerView.adapter = adapter
-            binding.recyclerView.layoutManager = LinearLayoutManager(this)
-
-        }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        getAllTodoList()
-    }
-
-
-
-    override fun onEditClick(position: Int) {
-        val intent = Intent(this, AddTodoActivity::class.java)
-        intent.putExtra("isEditMode", true)
-        intent.putExtra("todoItem", todoList[position])
-        startActivity(intent)
-    }
-
-    override fun onDeleteClick(position: Int) {
-        val builder : AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("할 일 삭제")
-        builder.setMessage("정말 삭제하시겠습니까?")
-        builder.setNegativeButton("취소",null)
-        builder.setPositiveButton("네",
-            object : DialogInterface.OnClickListener{
-                override fun onClick(p0 : DialogInterface?, p1: Int){
-                    deleteTodo(position)
-
-                }
-            })
-        builder.show()
-    }
-
-
-    private fun deleteTodo(position: Int) {
-        Thread{
-            todoDao.deleteTodo(todoList[position])
-            todoList.removeAt(position)
-            runOnUiThread{
-                adapter.notifyDataSetChanged()
-                Toast.makeText(this,"삭제되었습니다.", Toast.LENGTH_SHORT).show()
+        // 뷰 페이저를 이용한 프래그먼트 전환
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            when (position) {
+                0 -> tab.text = "할 일"
+                1 -> tab.text = "관리"
             }
-        }.start()
+        }.attach()
+
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                // 탭이 선택되었을 때 해당 프래그먼트로 전환
+                val selectedFragment = fragmentList[tab?.position ?: 0]
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, selectedFragment)
+                    .commit()
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                //미구현
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                //미구현
+            }
+        })
+
+
     }
 
-    
 }

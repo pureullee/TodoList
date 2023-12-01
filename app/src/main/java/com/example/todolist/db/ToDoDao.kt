@@ -19,4 +19,7 @@ interface ToDoDao {
 
     @Update
     fun updateTodo(todo : ToDoEntity)
+
+    @Query("SELECT COUNT(*) FROM ToDoEntity WHERE isCheck = 0 AND date < :currentDate")
+    fun getExpiredTodoCount(currentDate: Long): Int
 }
