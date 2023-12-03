@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import java.util.Date
 
 @Dao
 interface ToDoDao {
@@ -22,4 +23,7 @@ interface ToDoDao {
 
     @Query("SELECT COUNT(*) FROM ToDoEntity WHERE isCheck = 0 AND date < :currentDate")
     fun getExpiredTodoCount(currentDate: Long): Int
+
+    @Query("SELECT * FROM ToDoEntity WHERE date = :selectedDate")
+    fun getTodoByDate(selectedDate: Date): List<ToDoEntity>
 }

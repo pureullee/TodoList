@@ -8,9 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.databinding.ItemTodoBinding
 import com.example.todolist.db.ToDoEntity
 import android.icu.util.Calendar
+import android.view.MotionEvent
+import androidx.core.view.isVisible
 import java.util.Locale
 
-class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, private val listener: OnItemClickListener) : RecyclerView.Adapter<TodoRecyclerViewAdapter.MyViewHolder>(){
+class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>,
+                              private val listener: OnItemClickListener,
+                              private val onSwapButtonListener: OnSwapButtonListener
+) : RecyclerView.Adapter<TodoRecyclerViewAdapter.MyViewHolder>(),
+    ItemTouchHelperListener
+{
 
 
     inner class MyViewHolder(binding : ItemTodoBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -23,6 +30,7 @@ class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, priv
         val btn_delete = binding.btnDelete
         val tv_bar = binding.tvBar
         val tv_check = binding.tvCheck
+        val btn_swap = binding.btnSwap
         }
 
     override fun onCreateViewHolder(
@@ -97,10 +105,46 @@ class TodoRecyclerViewAdapter(private val todoList : ArrayList<ToDoEntity>, priv
             todoData.isCheck = false
             listener.onCheckClick(position)
         }
-    }
 
+        holder.btn_swap.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 버튼이 눌린 경우 구현
+                    onSwapButtonListener?.onSwapButtonPressed()
+                }
+                MotionEvent.ACTION_UP -> {
+                    // 버튼에서 손을 뗀 경우 구현
+                    onSwapButtonListener?.onSwapButtonReleased()
+                }
+            }
+            // true 반환으로써 이벤트 소비를 나타냄
+            true
+        }
+
+    }
 
     override fun getItemCount(): Int {
         return todoList.size
     }
+
+    override fun onItemMove(from_position: Int, to_position: Int): Boolean {
+        val name = todoList[from_position]
+        // 리스트 갱신
+        todoList.removeAt(from_position)
+        todoList.add(to_position, name)
+
+        // fromPosition에서 toPosition으로 아이템 이동 공지
+        notifyItemMoved(from_position, to_position)
+        return true
+    }
+
+    override fun onItemSwipe(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    private fun setTodo(todo : List<ToDoEntity>){
+
+    }
+
+
 }

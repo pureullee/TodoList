@@ -6,5 +6,8 @@ interface OnItemClickListener {
     fun onDeleteClick(position: Int)
 
     fun onCheckClick(position: Int)
+    fun onSwapButtonPressed()
+
+    fun onSwapButtonReleased()
 
 }

@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity(){
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val fragmentList = listOf(MainFragment(), CheckFragment())
+        val fragmentList = listOf(MainFragment(), CheckFragment(), CalendarFragment())
         val adapter = ViewPagerAdapter(fragmentList, supportFragmentManager, lifecycle)
 
         binding.viewPager.adapter = adapter
@@ -26,26 +26,9 @@ class MainActivity : AppCompatActivity(){
             when (position) {
                 0 -> tab.text = "할 일"
                 1 -> tab.text = "관리"
+                2 -> tab.text = "달력"
             }
         }.attach()
-
-        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                // 탭이 선택되었을 때 해당 프래그먼트로 전환
-                val selectedFragment = fragmentList[tab?.position ?: 0]
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer, selectedFragment)
-                    .commit()
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                //미구현
-            }
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                //미구현
-            }
-        })
-
 
     }
 
